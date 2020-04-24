@@ -18,7 +18,7 @@ class Board:
         self._board_y = 0
         self._board_width = 0
         self._board_height = 0
-        self.board = np.full((self._BOARD_HEIGHT // self._SQUARE_WH, self._BOARD_WIDTH // self._SQUARE_WH), -1)
+        self.board = np.full((self._BOARD_HEIGHT // self._SQUARE_WH, self._BOARD_WIDTH // self._SQUARE_WH), Board.COVERED)
 
     def _init_template(self):
         self._templates = []

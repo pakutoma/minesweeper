@@ -64,7 +64,7 @@ def solver(board):
                         board.flag(cell_x, cell_y)
                         count += 1
     if count == 0:
-        c, r = np.where(board.board == -1)
+        c, r = np.where(board.board == Board.COVERED)
         print('random')
         board.uncover(r[0], c[0])
 
