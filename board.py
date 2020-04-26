@@ -12,6 +12,7 @@ class Board:
     _BOARD_HEIGHT = 500
     _TEMPLATE_WH = 21
     _TEMPLATE_THRESHOLD = 1
+    _ALL_MINES_NUM = 99
 
     def __init__(self):
         self._board_x = 0
@@ -19,6 +20,7 @@ class Board:
         self._board_width = 0
         self._board_height = 0
         self.board = np.full((self._BOARD_HEIGHT // self._SQUARE_WH, self._BOARD_WIDTH // self._SQUARE_WH), Board.COVERED)
+        self.mines_num = self._ALL_MINES_NUM
 
     def _init_template(self):
         self._templates = []
@@ -43,7 +45,7 @@ class Board:
             'images/board.png')
         pyautogui.moveTo(self._board_x + self._SQUARE_WH // 2, self._board_y + self._SQUARE_WH // 2)
         pyautogui.click()
-        return
+        self.mines_num = self._ALL_MINES_NUM
 
     def load(self):
         pyautogui.moveTo(self._board_x + self._SQUARE_WH // 2, self._board_y + self._SQUARE_WH // 2)
@@ -69,15 +71,14 @@ class Board:
         pyautogui.click()
         self.board[y, x] = 8
         print('uncover', x, y)
-        return
 
     def flag(self, x, y):
         pyautogui.moveTo(self._board_x + x * self._SQUARE_WH + self._SQUARE_WH // 2,
                          self._board_y + y * self._SQUARE_WH + self._SQUARE_WH // 2)
         pyautogui.rightClick()
         self.board[y, x] = -2
+        self.mines_num -= 1
         print('flag', x, y)
-        return
 
     def _search_square(self, board_img, template):
         places = []
@@ -91,3 +92,40 @@ class Board:
                 if np.array_equal(square, template):
                     places.append((x // self._SQUARE_WH, y // self._SQUARE_WH))
         return places
+
+
+def get_arounds(board, x, y, width, height):
+    arounds = {}
+    if x > 0 and y > 0:
+        arounds[0] = board[y - 1, x - 1]
+    if y > 0:
+        arounds[1] = board[y - 1, x]
+    if x < width - 1 and y > 0:
+        arounds[2] = board[y - 1, x + 1]
+    if x > 0:
+        arounds[3] = board[y, x - 1]
+    if x < width - 1:
+        arounds[4] = board[y, x + 1]
+    if x > 0 and y < height - 1:
+        arounds[5] = board[y + 1, x - 1]
+    if y < height - 1:
+        arounds[6] = board[y + 1, x]
+    if x < width - 1 and y < height - 1:
+        arounds[7] = board[y + 1, x + 1]
+    return arounds
+
+
+def calc_pos(pos, x, y):
+    if pos in [0, 3, 5]:
+        cell_x = x - 1
+    elif pos in [1, 6]:
+        cell_x = x
+    else:
+        cell_x = x + 1
+    if pos < 3:
+        cell_y = y - 1
+    elif pos < 5:
+        cell_y = y
+    else:
+        cell_y = y + 1
+    return cell_x, cell_y
