@@ -46,5 +46,5 @@ if __name__ == '__main__':
     search = Search()
     for i in range(100):
         if not search.search(board) and not solver(board):
-            pass
+            break
         board.load()
